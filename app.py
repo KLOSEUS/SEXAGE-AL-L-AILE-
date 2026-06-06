@@ -17,7 +17,7 @@ BASE_DIR   = r"C:\Users\guill\Desktop\IA SECOURS\IA_Poussins"
 MODEL_PATH = os.path.join(BASE_DIR, "models", "meilleur_modele.pth")
 DEVICE     = torch.device("cpu")
 CLASSES    = ["Femelle", "Male"]
-SEUIL      = 0.55
+SEUIL      = 0.70
 
 BG       = "#1e1e2e"
 CARD     = "#2a2a3e"
@@ -48,6 +48,33 @@ def charger_modele():
     return modele
 
 def predire(modele, chemin):
+    # Validation morphologique préalable pour écarter les images hors-sujet (ex: serpents, paysages)
+    try:
+        img_temp = Image.open(chemin).convert("L")
+        img_temp = img_temp.resize((224, 224))
+        arr_temp = np.array(img_temp, dtype=np.float32)
+        h, w     = arr_temp.shape
+        marge    = int(0.2 * min(h, w))
+        zone     = arr_temp[marge:h-marge, marge:w-marge]
+
+        # 1. Luminosité (ratio_clair) : les rémiges sont très sombres
+        pixels_clairs = (zone > 128).sum()
+        ratio_clair   = (pixels_clairs / zone.size) * 100
+
+        # 2. Contraste : écart-type de l'intensité
+        contraste = float(zone.std())
+
+        # 3. Densité de contours
+        img_pil = Image.fromarray(zone.astype(np.uint8))
+        contours = np.array(img_pil.filter(ImageFilter.FIND_EDGES), dtype=np.float32)
+        densite_contours = (contours > 30).sum() / contours.size * 100
+
+        # Seuils de validation morphologique basés sur le jeu de données réel
+        if ratio_clair > 5.0 or contraste < 12.0 or contraste > 50.0 or densite_contours < 1.5 or densite_contours > 15.0:
+            return "Non conforme", 0.0, 0.0, 0.0
+    except:
+        return "Non conforme", 0.0, 0.0, 0.0
+
     image  = Image.open(chemin).convert("RGB")
     tensor = transform(image).unsqueeze(0)
     with torch.no_grad():
@@ -462,10 +489,15 @@ class App:
             self.verdict_label.config(
                 text=f"C'est une femelle ! ({conf:.1f}%)",
                 fg=SUCCESS)
+        elif classe == "Non conforme":
+            self.resultat_label.config(text="Indet.",   fg=WARNING)
+            self.verdict_label.config(
+                text="Image non conforme (pas un poussin/rémige)",
+                fg=WARNING)
         else:
             self.resultat_label.config(text="Indet.",   fg=WARNING)
             self.verdict_label.config(
-                text=f"Confiance insuffisante ({conf:.1f}% < 70%)",
+                text=f"Confiance insuffisante ({conf:.1f}% < {SEUIL*100:.0f}%)",
                 fg=WARNING)
 
     def maj_compteur(self):
@@ -488,7 +520,7 @@ class App:
         femelles = [r for r in self.resultats
                     if r["sexe"] == "Femelle"]
         indets   = [r for r in self.resultats
-                    if r["sexe"] == "Indetermine"]
+                    if r["sexe"] not in ["Male", "Femelle"]]
 
         win = tk.Toplevel(self.root)
         win.title("Histogrammes — Analyse complete")
