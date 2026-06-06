@@ -1,0 +1,21 @@
+{
+    "projet": "Sexage Poussins par Remiges",
+    "architecture": "ResNet18 + Transfer Learning",
+    "classes": [
+        "male",
+        "femelle"
+    ],
+    "dataset": "426 males + 526 femelles (952 total)",
+    "precision_val": "96.69%",
+    "auc_roc": 0.974,
+    "precision_male": "96.12%",
+    "rappel_male": "98.02%",
+    "precision_femelle": "97.44%",
+    "rappel_femelle": "95.0%",
+    "nb_epochs": 30,
+    "seuil_confiance": "70%",
+    "taille_image": "224x224",
+    "framework": "PyTorch 2.12",
+    "date": "01/06/2026 02:00",
+    "contrainte_temps": "< 5ms par image (CPU)"
+}
