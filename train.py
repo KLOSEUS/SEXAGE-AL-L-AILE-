@@ -68,7 +68,7 @@ val_loader    = DataLoader(val_dataset,   batch_size=BATCH_SIZE,
 print(f"Classes  : {train_dataset.classes}")
 print(f"Train    : {len(train_dataset)} images")
 print(f"Val      : {len(val_dataset)} images")
-print(f"Males    : {class_counts[0]} | Femelles : {class_counts[1]}")
+print(f"Femelles : {class_counts[0]} | Males    : {class_counts[1]}")
 
 # ══════════════════════════════════════════
 #  MODELE

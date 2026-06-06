@@ -23,7 +23,7 @@ def sauvegarder(modele, metriques):
     torch.save({
         "model_state_dict" : modele.state_dict(),
         "architecture"     : "ResNet18 + Transfer Learning (layer3+layer4+fc)",
-        "classes"          : ["male", "femelle"],
+        "classes"          : ["femelle", "male"],
         "precision_val"    : metriques["precision"],
         "auc_roc"          : metriques["auc"],
         "precision_male"   : metriques["prec_male"],
@@ -45,7 +45,7 @@ def sauvegarder_json(metriques):
     infos = {
         "projet"           : "Sexage Poussins par Remiges",
         "architecture"     : "ResNet18 + Transfer Learning",
-        "classes"          : ["male", "femelle"],
+        "classes"          : ["femelle", "male"],
         "dataset"          : "426 males + 526 femelles (952 total)",
         "precision_val"    : f"{metriques['precision']}%",
         "auc_roc"          : metriques["auc"],

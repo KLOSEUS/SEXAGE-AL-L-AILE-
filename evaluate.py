@@ -19,7 +19,7 @@ MODEL_PATH = os.path.join(BASE_DIR, "models", "meilleur_modele.pth")
 RESULTS    = os.path.join(BASE_DIR, "results")
 os.makedirs(RESULTS, exist_ok=True)
 DEVICE     = torch.device("cpu")
-CLASSES    = ["Male", "Femelle"]
+CLASSES    = ["Femelle", "Male"]
 SEUIL      = 0.70
 
 # ══════════════════════════════════════════
@@ -123,14 +123,14 @@ ax.set_xlabel("Predit",  fontsize=13, labelpad=10)
 ax.set_ylabel("Reel",    fontsize=13, labelpad=10)
 ax.set_title("Matrice de Confusion", fontsize=15, fontweight="bold", pad=15)
 
-vp = cm[0][0]; fn = cm[0][1]
-fp = cm[1][0]; vn = cm[1][1]
-precision_m = vp/(vp+fp) if (vp+fp) > 0 else 0
-rappel_m    = vp/(vp+fn) if (vp+fn) > 0 else 0
-precision_f = vn/(vn+fn) if (vn+fn) > 0 else 0
-rappel_f    = vn/(vn+fp) if (vn+fp) > 0 else 0
+vf = cm[0][0]; fm = cm[0][1]
+ff = cm[1][0]; vm = cm[1][1]
+precision_m = vm/(vm+fm) if (vm+fm) > 0 else 0
+rappel_m    = vm/(vm+ff) if (vm+ff) > 0 else 0
+precision_f = vf/(vf+ff) if (vf+ff) > 0 else 0
+rappel_f    = vf/(vf+fm) if (vf+fm) > 0 else 0
 
-legende = (f"VP={vp}  FN={fn}  FP={fp}  VN={vn}\n"
+legende = (f"VF={vf}  FM={fm}  FF={ff}  VM={vm}\n"
            f"Prec. Male={precision_m*100:.1f}%  "
            f"Rappel Male={rappel_m*100:.1f}%\n"
            f"Prec. Femelle={precision_f*100:.1f}%  "
@@ -146,8 +146,8 @@ print("\nSauvegarde : 1_matrice_confusion.png")
 # ══════════════════════════════════════════
 #  2. DISTRIBUTION DES CONFIANCES
 # ══════════════════════════════════════════
-conf_males    = all_confs[all_labels == 0]
-conf_femelles = all_confs[all_labels == 1]
+conf_femelles = all_confs[all_labels == 0]
+conf_males    = all_confs[all_labels == 1]
 
 fig, ax = plt.subplots(figsize=(9, 5))
 ax.hist(conf_males,    bins=20, alpha=0.7, color=COLORS["male"],
@@ -171,10 +171,10 @@ print("Sauvegarde : 2_distribution_confiances.png")
 # ══════════════════════════════════════════
 #  3. REPARTITION MALE / FEMELLE
 # ══════════════════════════════════════════
-nb_males    = (all_labels == 0).sum()
-nb_femelles = (all_labels == 1).sum()
-pred_males    = (all_preds[mask] == 0).sum()
-pred_femelles = (all_preds[mask] == 1).sum()
+nb_femelles = (all_labels == 0).sum()
+nb_males    = (all_labels == 1).sum()
+pred_femelles = (all_preds[mask] == 0).sum()
+pred_males    = (all_preds[mask] == 1).sum()
 
 fig, axes = plt.subplots(1, 2, figsize=(10, 5))
 axes[0].bar(["Males", "Femelles"],
