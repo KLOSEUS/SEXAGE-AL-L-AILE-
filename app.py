@@ -13,7 +13,7 @@ from model import creer_modele
 # ══════════════════════════════════════════
 #  CONFIGURATION
 # ══════════════════════════════════════════
-BASE_DIR   = r"C:\Users\guill\Desktop\IA SECOURS\IA_Poussins"
+BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(BASE_DIR, "models", "meilleur_modele.pth")
 DEVICE     = torch.device("cpu")
 CLASSES    = ["Femelle", "Male"]
@@ -976,7 +976,9 @@ class App:
         wb.save(chemin)
         self.status.config(
             text=f"Excel exporte : {os.path.basename(chemin)}",
-            fg=SUCCESS)# ══════════════════════════════════════════
+            fg=SUCCESS)
+
+# ══════════════════════════════════════════
 #  LANCEMENT
 # ══════════════════════════════════════════
 if __name__ == "__main__":

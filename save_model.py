@@ -7,7 +7,7 @@ from model import creer_modele
 # ══════════════════════════════════════════
 #  CONFIGURATION
 # ══════════════════════════════════════════
-BASE_DIR   = r"C:\Users\guill\Desktop\IA_Poussins"
+BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
 MODEL_DIR  = os.path.join(BASE_DIR, "models")
 MODEL_PATH = os.path.join(MODEL_DIR, "meilleur_modele.pth")
 DEVICE     = torch.device("cpu")
@@ -80,7 +80,7 @@ def verifier(chemin):
         sortie = modele(test)
     print(f"  Architecture  : {checkpoint['architecture']}")
     print(f"  Classes       : {checkpoint['classes']}")
-    print(f"  Precision     : {checkpoint['precision_val']}%")
+    print(f"  Precision     : {checkpoint['precision_val']}")
     print(f"  AUC-ROC       : {checkpoint['auc_roc']}")
     print(f"  Seuil         : {checkpoint['seuil_confiance']*100:.0f}%")
     print(f"  Test sortie   : {sortie.shape}")

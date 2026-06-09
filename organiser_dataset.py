@@ -3,7 +3,7 @@ A lancer UNE SEULE FOIS pour organiser le dataset en train/val
 """
 import os, shutil, random
 
-BASE_DIR = r"C:\Users\guill\Desktop\IA SECOURS\IA_Poussins"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "data")
 
 random.seed(42)

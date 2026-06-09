@@ -13,7 +13,7 @@ from model import creer_modele
 # ══════════════════════════════════════════
 #  CONFIGURATION
 # ══════════════════════════════════════════
-BASE_DIR   = r"C:\Users\guill\Desktop\IA_Poussins"
+BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
 VAL_DIR    = os.path.join(BASE_DIR, "data", "val")
 MODEL_PATH = os.path.join(BASE_DIR, "models", "meilleur_modele.pth")
 RESULTS    = os.path.join(BASE_DIR, "results")

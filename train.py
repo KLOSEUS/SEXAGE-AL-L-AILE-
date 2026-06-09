@@ -9,16 +9,15 @@ from model import creer_modele
 # ══════════════════════════════════════════
 #  CONFIGURATION
 # ══════════════════════════════════════════
-BASE_DIR  = r"C:\Users\guill\Desktop\IA SECOURS\IA_Poussins"
+BASE_DIR  = os.path.dirname(os.path.abspath(__file__))
 TRAIN_DIR = os.path.join(BASE_DIR, "data", "train")
 VAL_DIR   = os.path.join(BASE_DIR, "data", "val")
 MODEL_DIR = os.path.join(BASE_DIR, "models")
 os.makedirs(MODEL_DIR, exist_ok=True)
 
-# APRES
 EPOCHS     = 20
 BATCH_SIZE = 16
-LR         = 0.0005   # Plus petit car on decouvre plus de couches
+LR         = 0.0005
 DEVICE     = torch.device("cpu")
 
 print(f"Appareil : {DEVICE}")
@@ -26,13 +25,35 @@ print(f"Appareil : {DEVICE}")
 # ══════════════════════════════════════════
 #  TRANSFORMATIONS
 # ══════════════════════════════════════════
+# Augmentations adaptées aux ailes de poussins :
+#  - Petites rotations (aile peut être inclinée)
+#  - Zoom léger (distance à la caméra variable)
+#  - Variation de luminosité/contraste (éclairage industriel variable)
+#  - Déplacement léger (aile pas toujours centrée)
+#  - Pas de flip vertical (structure des rémiges est orientée)
 train_transforms = transforms.Compose([
-    transforms.Resize((224, 224)),
+    transforms.Resize((256, 256)),
     transforms.Grayscale(num_output_channels=3),
-    transforms.RandomHorizontalFlip(),
-    transforms.RandomRotation(15),
-    transforms.ColorJitter(brightness=0.3, contrast=0.3),
-    transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),
+    # Déplacement léger : l'aile peut ne pas être centrée
+    transforms.RandomAffine(
+        degrees=0,
+        translate=(0.1, 0.1)
+    ),
+    # Rotation légère : aile peut être légèrement inclinée
+    transforms.RandomRotation(degrees=12),
+    # Zoom léger : distance caméra/aile variable
+    transforms.RandomResizedCrop(224, scale=(0.80, 1.0), ratio=(0.9, 1.1)),
+    # Flip horizontal uniquement (pas vertical : la structure des rémiges compte)
+    transforms.RandomHorizontalFlip(p=0.5),
+    # Variation de luminosité et contraste : éclairage industriel variable
+    transforms.ColorJitter(
+        brightness=0.25,
+        contrast=0.25,
+        saturation=0.0,   # Inutile en niveaux de gris
+        hue=0.0
+    ),
+    # Légère augmentation de netteté/flou pour simuler la mise au point
+    transforms.RandomApply([transforms.GaussianBlur(kernel_size=3, sigma=(0.1, 1.0))], p=0.2),
     transforms.ToTensor(),
     transforms.Normalize([0.485, 0.456, 0.406],
                          [0.229, 0.224, 0.225])
@@ -167,7 +188,7 @@ for epoch in range(1, EPOCHS + 1):
 # ══════════════════════════════════════════
 #  SAUVEGARDE HISTORIQUE
 # ══════════════════════════════════════════
-with open(os.path.join(BASE_DIR, "resultats_entrainement.json"), "w") as f:
+with open(os.path.join(BASE_DIR, "resultats_entrainement.json"), "w", encoding="utf-8") as f:
     json.dump(historique, f, indent=4)
 
 print("\n" + "="*50)
